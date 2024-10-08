@@ -84,7 +84,7 @@ exports.VerifyOtp = CatchAsyncError(async(req,res,next)=>{
     SendToken(user,res,200)
 })
 
-exports.GetUsersEmail = CatchAsyncError(async(req,res)=>{
+exports.GetUsersEmail = CatchAsyncError(async(req,res,next)=>{
 
 
     const userfilter= new Apifeatures(UserModel.find({},{userEmail: 1,_id:0,userName: 1}),req.query).search()
@@ -249,7 +249,7 @@ console.log(req.params)
 })
 
 
-exports.addUser = CatchAsyncError(async(req,res)=>{
+exports.addUser = CatchAsyncError(async(req,res,next)=>{
 
     const {userName,userEmail,dob,position,mobile,department,address} = req.body
 
@@ -376,7 +376,7 @@ let leaveType =""
     })
 })
 
-exports.getLeaveHistory = CatchAsyncError(async(req,res)=>{
+exports.getLeaveHistory = CatchAsyncError(async(req,res,next)=>{
 
     const leaves = await LeaveModel.find({$or:[{status:'Approved'},{status:'Declined'}]})
 
@@ -391,7 +391,7 @@ exports.getLeaveHistory = CatchAsyncError(async(req,res)=>{
     })
 })
 
-exports.userProfile = CatchAsyncError(async(req,res)=>{
+exports.userProfile = CatchAsyncError(async(req,res,next)=>{
 
     const {id} = req.params
 
@@ -408,7 +408,7 @@ exports.userProfile = CatchAsyncError(async(req,res)=>{
     })
 })
 
-exports.adminDashboard = CatchAsyncError(async(req,res)=>{
+exports.adminDashboard = CatchAsyncError(async(req,res,next)=>{
 
 
     const today = new Date()

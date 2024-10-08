@@ -225,7 +225,7 @@ exports.viewProfile = CatchAsyncError(async(req,res,next)=>{
     })
 })
 
-exports.requestLeave = CatchAsyncError(async(req,res)=>{
+exports.requestLeave = CatchAsyncError(async(req,res,next)=>{
     const user = req.user
 
     const {type,reason,startDate,endDate} = req.body
@@ -243,7 +243,7 @@ exports.requestLeave = CatchAsyncError(async(req,res)=>{
     })
 })
 
-exports.getAnnouncement = CatchAsyncError(async(req,res)=>{
+exports.getAnnouncement = CatchAsyncError(async(req,res,next)=>{
 
     const announcements = await AnnouncementModel.find()
 
@@ -275,7 +275,7 @@ exports.getUserLeaveHistory = CatchAsyncError(async(req,res,next)=>{
     })
 })
 
-exports.dashboard = CatchAsyncError(async(req,res)=>{
+exports.dashboard = CatchAsyncError(async(req,res,next)=>{
 
     const user = req.user
     const today = new Date()
@@ -375,7 +375,7 @@ const threemonths ={
     })
 })
 
-exports.updateProfile = CatchAsyncError(async(req,res)=>{
+exports.updateProfile = CatchAsyncError(async(req,res,next)=>{
 
     const user = req.user
 

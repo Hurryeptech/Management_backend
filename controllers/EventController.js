@@ -41,7 +41,7 @@ exports.addEvent = CatchAsyncError(async(req,res,next)=>{
 
 })
 
-exports.getAllEvent = CatchAsyncError(async(req,res)=>{
+exports.getAllEvent = CatchAsyncError(async(req,res,next)=>{
 
     // const {id} = req.user
 

@@ -4,7 +4,7 @@ const HolidayModel = require("../models/HolidayModel");
 
 
 
-exports.addHolidays = CatchAsyncError(async(req,res)=>{
+exports.addHolidays = CatchAsyncError(async(req,res,next)=>{
 
     const {date,reason} = req.body
 
@@ -24,7 +24,7 @@ exports.addHolidays = CatchAsyncError(async(req,res)=>{
     })
 })
 
-exports.getHolidays = CatchAsyncError(async(req,res)=>{
+exports.getHolidays = CatchAsyncError(async(req,res,next)=>{
 
     const holidays = await HolidayModel.find()
 

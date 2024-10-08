@@ -17,7 +17,7 @@ exports.createAnnouncement = CatchAsyncError(async(req,res,next)=>{
     })
 })
 
-exports.updateAnnouncement = CatchAsyncError(async(req,res)=>{
+exports.updateAnnouncement = CatchAsyncError(async(req,res,next)=>{
 
     const {id} = req.params
 

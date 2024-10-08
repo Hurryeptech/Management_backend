@@ -5,7 +5,7 @@ const TeamModel = require("../models/TeamModel")
 const UserModel = require("../models/UserModel")
 const ErrorHandler = require("../utils/ErrorHandler")
 
-exports.createTeam = CatchAsyncError(async(req,res)=>{
+exports.createTeam = CatchAsyncError(async(req,res,next)=>{
 
     const {teamName} = req.body
     const {userEmail} = req.user
@@ -63,7 +63,7 @@ exports.addMembers = CatchAsyncError(async(req,res,next)=>{
 })
 
 
-exports.deleteMembers = CatchAsyncError(async(req,res)=>{
+exports.deleteMembers = CatchAsyncError(async(req,res,next)=>{
 
     const userEmail = req.params.userEmail
     const teamid = req.params.id
@@ -184,7 +184,7 @@ const results2 = await TeamModel.aggregate([
     
 // })
 
-exports.getAssignee = CatchAsyncError(async(req,res)=>{
+exports.getAssignee = CatchAsyncError(async(req,res,next)=>{
 
     let id =req.params.id
     id= new mongoose.Types.ObjectId(id)
@@ -229,7 +229,7 @@ exports.getAssignee = CatchAsyncError(async(req,res)=>{
     })
 })
 
-exports.deleteTeam = CatchAsyncError(async(req,res)=>{
+exports.deleteTeam = CatchAsyncError(async(req,res,next)=>{
 
     const {id}  = req.params
 
