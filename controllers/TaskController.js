@@ -1,4 +1,4 @@
-const { default: next } = require("next")
+
 const CatchAsyncError = require("../middlewares/CatchAsyncError")
 const TaskModel = require("../models/TaskModel")
 const TeamModel = require("../models/TeamModel")
