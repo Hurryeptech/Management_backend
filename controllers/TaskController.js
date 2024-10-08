@@ -93,7 +93,7 @@ exports.updateTasks = CatchAsyncError(async(req,res,next)=>{
 //     })
 // })
 
-exports.memberTaskUpdate = CatchAsyncError(async(req,res)=>{
+exports.memberTaskUpdate = CatchAsyncError(async(req,res,next)=>{
 
 
     const taskId = req.params.id
