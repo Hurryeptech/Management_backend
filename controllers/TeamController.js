@@ -62,6 +62,28 @@ exports.addMembers = CatchAsyncError(async(req,res,next)=>{
 
 })
 
+
+exports.deleteMembers = CatchAsyncError(async(req,res)=>{
+
+    const userEmail = req.params.userEmail
+    const teamid = req.params.id
+
+    const user = await UserModel.findOne({userEmail: userEmail})
+
+    const team = await TeamModel.findByIdAndUpdate(teamid,{
+        $pull:{
+            members: user.id
+        }
+    })
+
+  
+    
+
+    res.json({
+        success: true
+    })
+})
+
 exports.getTeams = CatchAsyncError(async(req,res,next)=>{
 
     const {id} = req.user

@@ -7,12 +7,14 @@ const UserModel = require("../models/UserModel")
 const Apifeatures = require("../utils/Apifeatures")
 const HolidayModel = require("../models/HolidayModel");
 const AttendenceModel = require("../models/AttendenceModel")
+const TeamModel = require("../models/TeamModel")
 const SpreadsheetModel = require("../models/SpreadsheetModel")
 const moment =require("moment")
 const fs = require("fs-extra")
 const cloudinary = require("../utils/Cloudinary")
 const LeaveModel = require("../models/LeaveModel")
 const sendMail = require("../utils/SendEmail")
+const TaskModel = require("../models/TaskModel")
 
 exports.RegisterAdmin = CatchAsyncError(async(req,res,next)=>{
 
@@ -117,10 +119,12 @@ exports.getAllUsers = CatchAsyncError(async(req,res,next)=>{
 
 exports.deleteUser = CatchAsyncError(async(req,res,next)=>{
 
-    const {id} = req.query
+    const {id} = req.params
 
+    console.log(id)
     const user = await UserModel.findByIdAndDelete(id)
-
+    const team = await TeamModel.findOneAndDelete({users: id})
+    const tasks = await TaskModel.findOneAndDelete({user: id})
     if(!user)
     {
         return next(new ErrorHandler("Error in Deleting the User",400))
@@ -135,8 +139,8 @@ exports.deleteUser = CatchAsyncError(async(req,res,next)=>{
 
 
 exports.getUserDetails = CatchAsyncError(async(req,res,next)=>{
-
-    const {userEmail} = req.query
+console.log(req.params)
+    const {id} = req.params
     const today = new Date() 
     const user = await UserModel.findOne({userEmail: userEmail})
 
@@ -306,21 +310,56 @@ exports.giveLeaveStatus = CatchAsyncError(async(req,res,next)=>{
 
     const leave = await LeaveModel.findByIdAndUpdate(id,req.body,{new: true})
 
-    if(!leave)
+    let addattendence = moment(leave.endDate).diff(leave.startDate,'days')
+    
+    if(addattendence > 0)
     {
-        return next(new ErrorHandler("Error in updating Leave",400))
+        
     }
+
+    console.log(addattendence)
+    // if(!leave)
+    // {
+    //     return next(new ErrorHandler("Error in updating Leave",400))
+    // }
 
 
     const user = await UserModel.findById(leave.user)
 
-    if(!user)
+    // if(!user)
+    // {
+    //     return next(new ErrorHandler("No User Found",400))
+    // }
+let leaveType =""
+    if(leave.status === 'Approved')
     {
-        return next(new ErrorHandler("No User Found",400))
+        if(user.paidLeave > 0)
+            {
+               leaveType ="Paid Leave"
+            }
+
+        else if(user.sickLeave > 0)
+            {
+                leaveType = "Sick Leave"
+            }
+            else
+            {
+               
+                leaveType = "Absent"
+            }
     }
+    let attendances= []
+   let sDate = moment(leave.startDate).toDate()
+    while(addattendence >= 0)
+    {
+        attendances.push({date: new Date(sDate.getFullYear(),sDate.getMonth(),sDate.getDate()),user: user.id,status: leaveType})
+     sDate.setDate(sDate.getDate()+1)
+        addattendence--
+    }
+    console.log(attendances)
+    await user.save()
 
-
-
+    const attendances2 = await AttendenceModel.insertMany(attendances)
     const mailOptions = {
                 to: user.userEmail,
                 html: leave.status === 'Approved'? `<p> Your Leave Request is Approved`: `<p> Your Leave Request is Rejected.Reason: ${leave.rejectReason}</p>`,
@@ -352,3 +391,47 @@ exports.getLeaveHistory = CatchAsyncError(async(req,res)=>{
     })
 })
 
+exports.userProfile = CatchAsyncError(async(req,res)=>{
+
+    const {id} = req.params
+
+
+    const user  = await UserModel.findById(id)
+    console.log(user)
+    if(!user)
+    {
+        return next(new ErrorHandler("No user Found",401))
+    }
+    res.json({
+        success: true,
+        user
+    })
+})
+
+exports.adminDashboard = CatchAsyncError(async(req,res)=>{
+
+
+    const today = new Date()
+
+    const firstdate = new Date(today.getFullYear(),today.getMonth(), 1, 0, 0, 0)
+    const lastDate = new Date(today.getFullYear(),today.getMonth()+1, 0, 23, 59, 59, 999)
+const todayDate = new Date(today.getFullYear(),today.getMonth(),today.getDate())
+    const users = (await UserModel.find()).length
+
+    const attendence = (await AttendenceModel.find({date:todayDate})).length
+    const absentTotal = Math.abs(users - attendence)
+    const tasksComplete = (await SpreadsheetModel.find({date:{$gte: firstdate,$lte: lastDate},status:'completed'})).length
+    const tasksIncomplete = (await SpreadsheetModel.find({date:{$gte: firstdate,$lte: lastDate},status:'incomplete'})).length
+    
+
+    
+   
+    res.json({
+        success: true,
+        attendence,
+        absentTotal,
+        tasksComplete,
+        tasksIncomplete,
+        users
+    })
+})

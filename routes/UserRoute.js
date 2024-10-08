@@ -1,5 +1,5 @@
 const express = require("express")
-const { signup, signin, verifyOtp, viewProfile, sendMailNew, requestLeave, getAnnouncement, getUserLeaveHistory, dashboard } = require("../controllers/UserController")
+const { signup, signin, verifyOtp, viewProfile, sendMailNew, requestLeave, getAnnouncement, getUserLeaveHistory, dashboard, updateProfile } = require("../controllers/UserController")
 const {authenticate} = require("../middlewares/Authenticate")
 const router = express.Router()
 const multer = require("multer")
@@ -19,7 +19,7 @@ const storage = multer.diskStorage({
     console.log('Saving file to:', uploadDir);
     cb(null, uploadDir);
   },
-  filename: (req, file, cb) => {
+  filename: (req, file, cb,next) => {
     const uniqueName = Date.now() + path.extname(file.originalname);
     console.log('Generating unique filename:', uniqueName);
     cb(null, uniqueName);
@@ -30,7 +30,7 @@ const upload = multer({ storage });
 
 
 router.route("/user/sendMailNew").post(sendMailNew)
-router.route("/user/signup").post(upload.single('image'),signup)
+router.route("/user/signup").post(signup)
 router.route("/user/signin").post(signin)
 router.route("/user/verifyOtp").post(verifyOtp)
 router.route("/user/viewProfile").get(authenticate,viewProfile)
@@ -38,4 +38,5 @@ router.route("/user/requestLeave").post(authenticate,requestLeave)
 router.route("/user/getAnnouncements").get(getAnnouncement)
 router.route("/user/leaveHistory").get(authenticate,getUserLeaveHistory)
 router.route("/user/dashboard").get(authenticate,dashboard)
+router.route("/user/updateProfile").put(authenticate,upload.single('image'),updateProfile)
 module.exports = router

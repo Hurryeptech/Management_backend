@@ -4,11 +4,11 @@ const jwt= require("jsonwebtoken")
 const userSchema =new  mongoose.Schema({
     userName:{
        type: String,
-       required:[true,"Please Enter UserName"]
+    //    required:[true,"Please Enter UserName"]
     },
     userEmail:{
         type: String,
-        required:[true,"Please Enter UserEmail"]
+        // required:[true,"Please Enter UserEmail"]
     },
     team:[
         {
@@ -18,34 +18,26 @@ const userSchema =new  mongoose.Schema({
     ],
     image:{
         type: String,
-        required:[true,"Please Upload Image"]
+        // required:[true,"Please Upload Image"]
     },
     position:{
         type: String,
-        required:[true,"Please Enter Position"]
+        // required:[true,"Please Enter Position"]
     },
     mobile:{
         type: Number,
-        required:[true,"Please Enter Mobile"]
+        // required:[true,"Please Enter Mobile"]
     },
     dob:{
         type: Date,
-        required:[true,"Please Enter Date Of Birth"]
+        // required:[true,"Please Enter Date Of Birth"]
     },
-    bio:{
+    aboutText:{
         type: String
     },
     proficiency:[
         {
-            design:{
-                type: Number
-            },
-            frontEnd:{
-                type: Number
-            },
-            backEnd:{
-                type: Number
-            }
+         
         }
     ],
     skills:[
@@ -59,14 +51,33 @@ const userSchema =new  mongoose.Schema({
     },
     role:{
         type: String
+    },
+    socialUrl:[
+        {
+            
+        }
+    ],
+    otp:{
+        type: String
+    },
+    otpExpire:{
+        type: Date
+    },
+    paidLeave:{
+        type: Number
+    },
+    sickLeave:{
+        type: Number
+    },
+    account_Type:{
+        type: String
     }
-
     
 })
 
 userSchema.methods.getJwtToken = function(){
 
-    return jwt.sign({id: this.id},process.env.JWT_SECRET,{expiresIn: process.env.JWT_EXPIRES})
+    return jwt.sign({id: this.id},process.env.JWT_SECRET,{expiresIn: '7d'})
     
 }
 

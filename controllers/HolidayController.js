@@ -56,9 +56,10 @@ exports.updateHoliday = CatchAsyncError(async(req,res,next)=>{
     })
 })
 
-exports.deleteHoliday = CatchAsyncError(async(req,res)=>{
+exports.deleteHoliday = CatchAsyncError(async(req,res,next)=>{
 
-    const {id} = req.query
+    const {id} = req.params
+    console.log(id)
 
     const holiday = await HolidayModel.findByIdAndDelete(id)
 

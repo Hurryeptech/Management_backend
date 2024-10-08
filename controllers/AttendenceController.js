@@ -33,7 +33,7 @@ exports.logout = CatchAsyncError(async(req,res,next)=>{
     const logoutTime = Date.now()
     const dat = new Date(today.getFullYear(),today.getMonth(),today.getDate())
     const  user = req.user
-    const logoutUser = await AttendenceModel.findOne({date: dat})
+    const logoutUser = await AttendenceModel.findOne({date: dat,user: user.id})
 
     if(!logoutUser)
         {
@@ -51,25 +51,35 @@ exports.logout = CatchAsyncError(async(req,res,next)=>{
     const diff = (((logoutUser.logoutTime - logoutUser.loginTime) / 1000 /60 /60) %24)
 
 
-    if(diff <= 3)
+    if(diff <= 4)
     {
-        logoutUser.late =1
-        logoutUser.halfDay = 0
-        logoutUser.status = "Absent"
+        if(user.paidLeave > 0)
+        {
+            user.paidLeave -= 1
+            logoutUser.status = "Paid Leave"
+        }
+        else if(user.sickLeave > 0)
+        {
+            user.sickLeave -= 1
+            logoutUser.status = "Sick Leave"
+        }
+        else
+        {
+            logoutUser.status = "Absent"
+        }
+        
     }
-    else if(diff <= 5)
+    else if(diff <= 7)
     {
-        logoutUser.halfDay = 1
-        logoutUser.late =0 
+ 
         logoutUser.status = "HalfDay"
     }
     else
     {
-        logoutUser.halfDay = 0
-        logoutUser.late =0 
-        logoutUser.status = "FullDay"
+        
+        logoutUser.status = "Present"
     }
-
+    await user.save()
     await logoutUser.save()
     res.status(201).json({
         success: true,
@@ -100,7 +110,7 @@ exports.AttendenceAnalysis = CatchAsyncError(async(req,res,next)=>{
             pres:[
                 {
                  $match:{
-                    status: "FullDay"
+                    status: "Present"
                  }
                 },
                 {
@@ -126,6 +136,26 @@ exports.AttendenceAnalysis = CatchAsyncError(async(req,res,next)=>{
                 {
                     $count: "count"
                 }
+            ],
+            paid:[
+                {
+                    $match:{
+                        status: "Paid Leave"
+                    }
+                },
+                {
+                    $count: "count"
+                }
+            ],
+            sick:[
+                {
+                    $match:{
+                        status: "Sick Leave"
+                    }
+                },
+                {
+                    $count: "count"
+                }
             ]
         }
     }
@@ -134,10 +164,17 @@ exports.AttendenceAnalysis = CatchAsyncError(async(req,res,next)=>{
    const present = logs[0]?.pres[0]?.count ?? 0
    const absent = logs[0]?.abs[0]?.count ?? 0
    const half = logs[0]?.half[0]?.count ?? 0
+   const paid = logs[0]?.paid[0]?.count ?? 0
+   const sick = logs[0]?.sick[0]?.count ?? 0
+   const paidRemaining = user.paidLeave
+   const sickRemaining = user.sickLeave
     res.json({
         present: present,
         absent: absent,
-        half: half 
+        half: half ,
+        paidTaken: paid,
+        sickTaken: sick,
+        paidRemaining,sickRemaining
     })
  
 })

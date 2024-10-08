@@ -4,6 +4,7 @@ const dotenv  = require("dotenv")
 const path = require("path")
 const cors = require("cors")
 const ErrorMiddleWare = require("./middlewares/error")
+const {cronJob,cronJob2} = require("./utils/Cron")
 
 
 dotenv.config({path: path.join(__dirname,"./.env")})
