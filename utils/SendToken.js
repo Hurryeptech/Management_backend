@@ -3,9 +3,8 @@ const jwt = require('jsonwebtoken')
 const SendToken = (user,res,statusCode)=>{
    
 
-    
-    const token = jwt.sign({id:user.id},process.env.REFRESH_TOKEN,{expiresIn: '15m'})
-    const refreshToken = user.getJwtToken()
+
+    const token = user.getJwtToken()
                        
 
     const options={
@@ -14,11 +13,10 @@ const SendToken = (user,res,statusCode)=>{
         secure: true
     }
     
-    res.status(statusCode).cookie('accessToken',token,options).cookie('refreshToken',refreshToken,options).json({
+    res.status(statusCode).cookie('token',token,options).json({
         sucess: true,
         message: "Token Is Sent",
         token,
-        refreshToken,
         user
     })
 }

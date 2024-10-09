@@ -17,33 +17,16 @@ exports.authenticate = async (req, res, next) => {
 
     const accessToken = bearer
 
-    let decoded = {}
+    let decoded={}
     
-    try {
-         decoded = jwt.verify(accessToken, process.env.REFRESH_TOKEN)
-         
-       
-    } catch (error) {
+    
+      try {
+     decoded = jwt.verify(accessToken, process.env.JWT_SECRET)
+      } catch (error) {
+        return next(new ErrorHandler("Token Expired",400))
+      }
 
-
-        const refresh = req.headers['x-refresh-token']
-
-        
-        if (!refresh) {
-            return next(new ErrorHandler("Login first again , session expired -1", 401))
-        }
-
-
-        try {
-             decoded = jwt.verify(refresh, process.env.JWT_SECRET)
-             jwt.sign({id: decoded.id},process.env.REFRESH_TOKEN,{expiresIn:'15m'})
-             
-        } catch (error) {
-       
-            return next(new ErrorHandler("Login first again , session expired -2", 401))
-        }
-    }
-
+      
     const user = await userModel.findById(decoded.id)
  
     if (!user) {
