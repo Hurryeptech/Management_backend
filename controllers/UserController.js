@@ -71,12 +71,14 @@ fs.remove(imagePath, err => {
 exports.signin = CatchAsyncError(async(req,res,next)=>{
    
 
-    const {userEmail,accountType} = req.body
-  
+    const {userEmail,type} = req.body
+
+    console.log(req.body)
 
     const validUser = await userModel.findOne({userEmail: userEmail})
 
-    if(userEmail && accountType)
+
+    if(userEmail && type)
     {
         console.log(userEmail)
         if(validUser)
@@ -85,7 +87,7 @@ exports.signin = CatchAsyncError(async(req,res,next)=>{
         }
         else
         {
-            const newUser = await userModel.create({userEmail,account_Type: accountType})
+            const newUser = await userModel.create({userEmail,account_Type: type})
             console.log(newUser)
           return await  handleAttendence(newUser,res)
         }
@@ -225,6 +227,22 @@ exports.viewProfile = CatchAsyncError(async(req,res,next)=>{
     })
 })
 
+exports.viewScoialProfile = CatchAsyncError(async(req,res)=>{
+
+    const userEmail = req.params.email
+
+    const user = userModel.findOne({userEmail: userEmail})
+
+    if(!user)
+    {
+        return next(new ErrorHandler("No user Found",401))
+    }
+    res.status(200).json({
+        success: true,
+        user
+    })
+})
+
 exports.requestLeave = CatchAsyncError(async(req,res,next)=>{
     const user = req.user
 
@@ -243,20 +261,20 @@ exports.requestLeave = CatchAsyncError(async(req,res,next)=>{
     })
 })
 
-exports.getAnnouncement = CatchAsyncError(async(req,res,next)=>{
+// exports.getAnnouncement = CatchAsyncError(async(req,res,next)=>{
 
-    const announcements = await AnnouncementModel.find()
+//     const announcements = await AnnouncementModel.find()
 
-    if(!announcements)
-    {
-        return next(new ErrorHandler("No Announcements yet available",400))
-    }
+//     if(!announcements)
+//     {
+//         return next(new ErrorHandler("No Announcements yet available",400))
+//     }
 
-    res.status(200).json({
-        success: true,
-        announcements
-    })
-})
+//     res.status(200).json({
+//         success: true,
+//         announcements
+//     })
+// })
 
 exports.getUserLeaveHistory = CatchAsyncError(async(req,res,next)=>{
 

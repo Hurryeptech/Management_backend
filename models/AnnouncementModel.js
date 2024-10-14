@@ -10,7 +10,16 @@ const announcementSchema = new mongoose.Schema({
     },
     description:{
         type: String
-    }
+    },
+    isSeen: {
+        type: Boolean,
+        default: false, 
+      },
+      userId:[
+        {
+            type: mongoose.Types.ObjectId
+        }
+      ]
 })
 
 module.exports = mongoose.model("Announcement",announcementSchema)

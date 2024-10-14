@@ -32,3 +32,24 @@ exports.updateAnnouncement = CatchAsyncError(async(req,res,next)=>{
         success: true
     })
 })
+
+exports.getAnnouncements = CatchAsyncError(async(req,res)=>{
+
+    const update = await AnnouncementModel.updateMany({userId:{$nin:[req.user.id]}},{$addToSet:{userId:req.user.id}})
+    const announcement = await AnnouncementModel.find()
+
+    res.json({
+        success: true,
+        announcement
+    })
+})
+
+// exports.updateSeenAnnouncement = CatchAsyncError(async(req,res)=>{
+
+//     const {announcementIds} = req.body
+
+//     const announcement = await AnnouncementModel.updateMany( { _id: { $in: announcementIds } },
+//         { $set: { isSeen: true } })
+
+        
+// })
