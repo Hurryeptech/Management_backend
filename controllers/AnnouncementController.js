@@ -35,8 +35,9 @@ exports.updateAnnouncement = CatchAsyncError(async(req,res,next)=>{
 
 exports.getAnnouncements = CatchAsyncError(async(req,res)=>{
 
-    const update = await AnnouncementModel.updateMany({userId:{$nin:[req.user.id]}},{$addToSet:{userId:req.user.id}})
     const announcement = await AnnouncementModel.find()
+    const update = await AnnouncementModel.updateMany({userId:{$nin:[req.user.id]}},{$addToSet:{userId:req.user.id}})
+    
 
     res.json({
         success: true,
