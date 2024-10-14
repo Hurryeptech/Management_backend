@@ -11,6 +11,9 @@ const announcementSchema = new mongoose.Schema({
     description:{
         type: String
     },
+    time:{
+        type: Date,
+    },
     isSeen: {
         type: Boolean,
         default: false, 
