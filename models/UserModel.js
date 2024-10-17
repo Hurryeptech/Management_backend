@@ -32,13 +32,14 @@ const userSchema =new  mongoose.Schema({
         type: Date,
         // required:[true,"Please Enter Date Of Birth"]
     },
+    doj:{
+        type: Date
+    },
     aboutText:{
         type: String
     },
     proficiency:[
-        {
-         
-        }
+     
     ],
     skills:[
         
@@ -52,11 +53,11 @@ const userSchema =new  mongoose.Schema({
     role:{
         type: String
     },
-    socialUrl:[
+    socialUrl:
         {
-            
+            type: Object
         }
-    ],
+    ,
     otp:{
         type: String
     },

@@ -253,18 +253,14 @@ exports.addUser = CatchAsyncError(async(req,res,next)=>{
 
     const {userName,userEmail,dob,position,mobile,department,address} = req.body
 
+    console.log(req.body)
    
-
-    const imagePath = req.file.path
-
-    const cloud = await cloudinary.uploader.upload(imagePath,{folder: 'profile'})
     const user = await UserModel.create({
         userName,
         userEmail,
         dob,
         position,
         mobile,
-        image: cloud.url,
         department,
         address
     },)
@@ -274,10 +270,7 @@ exports.addUser = CatchAsyncError(async(req,res,next)=>{
         return next(new ErrorHandler("Problem in Creating User",500))
     }
 
-fs.remove(imagePath, err => {
-  if (err) return console.error(err)
-  console.log('profile Deleted!')
-})
+
 
     res.status(201).json({
         success: true,
@@ -397,7 +390,7 @@ exports.userProfile = CatchAsyncError(async(req,res,next)=>{
 
 
     const user  = await UserModel.findById(id)
-    console.log(user)
+   
     if(!user)
     {
         return next(new ErrorHandler("No user Found",401))

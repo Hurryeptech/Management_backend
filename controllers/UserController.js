@@ -73,14 +73,13 @@ exports.signin = CatchAsyncError(async(req,res,next)=>{
 
     const {userEmail,type} = req.body
 
-    console.log(req.body)
-
+    console.log("manoj")
     const validUser = await userModel.findOne({userEmail: userEmail})
 
 
     if(userEmail && type)
     {
-        console.log(userEmail)
+     
         if(validUser)
         {
        return await handleAttendence(validUser,res)
@@ -399,9 +398,11 @@ exports.updateProfile = CatchAsyncError(async(req,res,next)=>{
 
     if(req.file)
     {
+        console.log("file")
     const imagePath = req.file.path
     const cloud = await cloudinary.uploader.upload(imagePath,{folder: 'profile'})
     req.body.image = cloud.url
+    fs.remove(imagePath)
     }
     else{
         console.log("No file")
@@ -435,7 +436,7 @@ async function handleAttendence(user,res)
     let da = last.date
    let prev = new Date(today)
       prev.setDate(today.getDate()-1)
-    console.log(da,diff,prev)
+  
     
 const Holidays = await HolidayModel.find()
 let attendence=[]

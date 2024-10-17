@@ -40,7 +40,7 @@ router.post("/admin/addHolidays",addHolidays)
 router.get("/getHolidays",getHolidays)
 router.put("/admin/updateHolidays",updateHoliday)
 router.delete("/admin/deleteHolidays/:id",deleteHoliday)
-router.post("/admin/addUser",upload.single('image'),addUser)
+router.post("/admin/addUser",addUser)
 router.get("/admin/getAllUsers",getAllUsers)
 router.delete("/admin/deleteUser/:id",deleteUser)
 
