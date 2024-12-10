@@ -1,52 +1,56 @@
 const mongoose = require("mongoose")
 
 const taskSchema = new mongoose.Schema({
-    date:{
-        type: Date
-    },
-    internName:{
-        type: String,
 
+    subject:{
+        type: String,
+        required:[true,"Please Enter Subject"]
     },
-    client:{
+    createdBy:{
         type: String
     },
-    assignee:{
-        type: String,
-      
+    assignedTo:[
+        {
+            type: String
+        }
+    ],
+    followers:[
+        {
+            type: String
+        }
+    ],
+    hourlyRate:{
+        type: Number
     },
-    dueDate:{
+    startDate:{
         type: Date,
-     
-    },
-    task:{
-        type:String,
-     
+        required:[true,"Please Enter Start Date"]
     },
     status:{
         type: String,
-        
+        default:"Inprogress"
     },
-    description:{
-        type: String,
-      
-    
+    endDate:{
+        type: Date
     },
-    details:{
-        type:String
-    },
-    employeeStatus:{
+    priority:{
         type: String
     },
-    teams:[
-        {
-            type: mongoose.Types.ObjectId,
-            ref: "teams"
-        }
-    ],
+    repeatEvery:{
+        type: String
+    },
+    relatedTo:{
+        type: String
+    },
+    tags:{
+        type: String
+    },
+    taskDescription:{
+        type: String
+    },
     user:{
         type: mongoose.Types.ObjectId,
-        ref: "users"
+        ref: "User"
     }
 })
 

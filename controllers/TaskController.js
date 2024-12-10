@@ -1,131 +1,145 @@
-
+const { use } = require("react")
 const CatchAsyncError = require("../middlewares/CatchAsyncError")
-const TaskModel = require("../models/TaskModel")
-const TeamModel = require("../models/TeamModel")
+const taskModel = require("../models/TaskModel")
 const ErrorHandler = require("../utils/ErrorHandler")
-const UserModel = require("../models/UserModel")
-const SpreadsheetModel = require("../models/SpreadsheetModel")
-const moment = require("moment")
 
-// exports.addTask = CatchAsyncError(async(req,res,next)=>{
+const userModel = require("../models/UserModel")
 
 
-//     const {internName, assignee,dueDate,task,status,description} = req.body
+exports.createTasks = CatchAsyncError(async(req,res,next)=>{
 
-//     const {id} = req.params
-
-//     console.log(id)
-             
-//     const team = await TeamModel.findById(id)
-//     if(!team)
-//     {
-//         return next(new ErrorHandler("First Create Team",401))
-//     }
-//     const newTask = await TaskModel.create({
-//         internName: internName,
-//         assignee: assignee,
-//         dueDate: dueDate,
-//         task: task,
-//         status: status,
-//         description: description,
-//     })
-    
-// console.log(id)
-   
-//     newTask.teams.push(id)
-//     console.log(newTask)
-//     team.tasks.push(newTask.id)
-    
- 
-//     await team.save()
-//     await newTask.save()
-
-//     res.status(200).json({
-//         success: true,
-//         message: "Task Added",
-//         newTask
-//     })
-// })
-
-exports.getAllTasks = CatchAsyncError(async(req,res)=>{
-
-    const {userEmail} = req.body
-    const user = await UserModel.findOne(userEmail)
-    const allTasks = await TaskModel.find({user: user.id})
-
-    res.json({
-        success: true,
-        allTasks
-    })
-})
-
-exports.updateTasks = CatchAsyncError(async(req,res,next)=>{
-
-
-    const id = req.params.taskId
   
-    const updatedTask  = await TaskModel.findByIdAndUpdate(id,req.body,{new:true,runValidators: false})
-
-    if(!updatedTask)
-        {
-            return next(new ErrorHandler("No tasks is Found",400))
-        }
-
-     
-    res.json({
-        success: true,
-        updatedTask
-    })
-})
-
-// exports.deleteTask = CatchAsyncError(async(req,res,next)=>{
-//     const {id} = req.params
-//     const deleteTask = await TaskModel.findByIdAndDelete(id)
-
-//     if(!deleteTask)
-//     {
-//         return next(new ErrorHandler("some error while deleting",500))
-//     }
-
-//     res.status(200).json({
-//         success: true,
-//         message:"Task Deleted Successfully"
-//     })
-// })
-
-exports.memberTaskUpdate = CatchAsyncError(async(req,res,next)=>{
+req.body.user = req.user.id
 
 
-    const taskId = req.params.id
-    const {id} = req.user
-    const {employeeStatus} = req.body
-
-
-    const updatedTask  = await TaskModel.findByIdAndUpdate(taskId,{employeeStatus: employeeStatus},{new:true,runValidators: false})
-
-
-
-    const spreadsheet = await SpreadsheetModel.create({
-        date: moment(updatedTask.date).format("YYYY-MM-DD"),
-        assignee: updatedTask.assignee, 
-        task: updatedTask.task,
-        details: updatedTask.details, 
-        status: updatedTask.employeeStatus,
-        user: id,
-        client: updatedTask.client
-    })
-
-
-    if(!spreadsheet)
+    if(!req.body)
     {
-        return next(new ErrorHandler("Error in Creating in Spreadsheet",400))
+        return next(new ErrorHandler("Request Is Empty",400))
     }
 
+    const task = await taskModel.create(req.body)
+
     res.status(201).json({
+        success: true
+    })
+})
+
+exports.getTasks = CatchAsyncError(async(req,res,next)=>{
+
+    const tasks = await taskModel.find({user: req.user.id})
+
+    if(tasks.length <= 0)
+    {
+        return next(new ErrorHandler("No tasks are found",400))
+    }
+    res.status(200).json({
         success: true,
-        message:"Spreadsheet Created",
-        updatedTask
+        tasks
+    })
+})
+
+exports.getSingleTasks = CatchAsyncError(async(req,res,next)=>{
+
+    const tasksId = req.params.id
+
+    if(!tasksId)
+    {
+        return next(new ErrorHandler("Params is Empty",400))
+    }
+
+    const task = await taskModel.findById(tasksId)
+
+    if(!task)
+    {
+        return next(new ErrorHandler("task is not found",400))
+    }
+
+    res.status(200).json({
+        success: true,
+        task
+    })
+})
+
+exports.deleteTasks = CatchAsyncError(async(req,res)=>{
+
+    const taskId= req.params.id
+
+    if(!taskId)
+    {
+        return next(new ErrorHandler("Params is Empty",400))
+    }
+
+    const tasks = await taskModel.findByIdAndDelete(taskId)
+
+    res.status(204).json({
+        success: true
     })
 
+})
 
+exports.tasksDashboard = CatchAsyncError(async(req,res)=>{
+
+    const user = req.user
+    
+    const task = await taskModel.aggregate([
+        {
+            $match: {
+                user: user._id
+            }
+        },
+        {
+            $group: {
+                _id: null,        
+                Completed:{
+                    $sum:{$cond:[{$eq:['$status','Completed']},1,0]}
+                } ,
+                Pending:{
+                    $sum:{$cond:[{$eq:['$status','Pending']},1,0]}
+                }     ,
+                Inprogress:{
+                    $sum:{$cond:[{$eq:['$status','Inprogress']},1,0]}
+                }     ,
+                ReadyToDeliver:{
+                    $sum:{$cond:[{$eq:['$status','Ready to Deliver']},1,0]}
+                }         ,
+                NotStarted:{
+                    $sum:{$cond:[{$eq:['$status','Not Started']},1,0]}
+                }     ,
+                Testing:{
+                    $sum:{$cond:[{$eq:['$status','Testing']},1,0]}
+                }  
+            }
+        }
+    ]);
+
+    res.status(200).json({
+        success: true,
+        task
+    })
+})
+
+exports.getStaffs = CatchAsyncError(async(req,res)=>{
+
+    const staffs = await userModel.find({},{firstName: 1,empId:1,_id:0})
+   
+    // const names = staffs.map((st)=>st.firstName)
+    res.status(200).json({
+        success: true,
+        staffs
+        // names
+    })
+})
+
+exports.updateTasks = CatchAsyncError(async(req,res)=>{
+
+    const {id} = req.params
+     
+    const task = await taskModel.findByIdAndUpdate(id,req.body,{new: true})
+
+    console.log(task)
+
+    res.status(200).json({
+        success: true,
+        task
+    })
 })

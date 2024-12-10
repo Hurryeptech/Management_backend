@@ -1,79 +1,103 @@
 const mongoose = require("mongoose")
+const validators = require("mongoose-validator")
+
 const jwt= require("jsonwebtoken")
 
+
 const userSchema =new  mongoose.Schema({
-    userName:{
-       type: String,
-    //    required:[true,"Please Enter UserName"]
+    firstName:{
+        type: String,
+        // validate: validators({
+        //     validator: "isLength",
+        //     arguments:[2,8],
+        //     message:"the name should be {ARGS[0]} and {ARGS[1]}"
+        // })
+        required:[true,"Please Enter FirstName"]
+    },
+    lastName:{
+        type: String,
+        required:[true,"Please Enter LastName"]
     },
     userEmail:{
         type: String,
-        // required:[true,"Please Enter UserEmail"]
+        
+        required:[true,"Please Enter UserEmail"]
     },
-    team:[
-        {
-            type: mongoose.Types.ObjectId,
-            ref: "teams"
-        }
-    ],
+    empId:{
+        type: String,
+        unique: true
+    },
+    designation:{
+        type: String
+    },
     image:{
         type: String,
         // required:[true,"Please Upload Image"]
-    },
-    position:{
-        type: String,
-        // required:[true,"Please Enter Position"]
     },
     mobile:{
         type: Number,
         // required:[true,"Please Enter Mobile"]
     },
-    dob:{
-        type: Date,
-        // required:[true,"Please Enter Date Of Birth"]
-    },
-    doj:{
-        type: Date
-    },
-    aboutText:{
-        type: String
-    },
-    proficiency:[
-     
-    ],
-    skills:[
-        
-    ],
-    department:{
-        type: String
-    },
-    address:{
-        type: String
-    },
-    role:{
-        type: String
-    },
-    socialUrl:
-        {
-            type: Object
-        }
-    ,
     otp:{
         type: String
     },
     otpExpire:{
         type: Date
     },
-    paidLeave:{
-        type: Number
+    facebook:{
+        type: String
     },
-    sickLeave:{
+    skype:{
+        type: String
+    },
+    linkedin:{
+        type:String
+    },
+    hourlyRate:{
         type: Number
     },
     account_Type:{
         type: String
+    },
+    humanResource:{
+        type: Boolean,
+        default: false
+    },
+    administrator:{
+        type: Boolean,
+        default: false
+    },
+    welcomeEmail:{
+        type: Boolean
+    },
+    employee:{
+        type: Boolean,
+        default: true
+    },
+    active:{
+        type: Boolean,
+        default: true
+    },
+    lastLogin:{
+        type: Date
+    },
+    permissions:{
+        "staffs":{
+            create:{
+                type: Boolean
+            },
+            edit:{
+                type: Boolean
+            },
+            viewGlobal:{
+                type: Boolean
+            },
+         
+        }
+    },
+    reportingPerson:{
+        type: mongoose.Schema.ObjectId
     }
-    
 })
 
 userSchema.methods.getJwtToken = function(){

@@ -5,21 +5,16 @@ const nodemailer = require("nodemailer")
 const SendMail = require("../utils/SendEmail")
 const moment = require("moment")
 const UserModel = require("../models/UserModel")
+const { default: mongoose } = require("mongoose")
 
 
 exports.addEvent = CatchAsyncError(async(req,res,next)=>{
 
-    const {title,start,end} = req.body
-    const {id}= req.user
-
+    
+    const {id}= req.admin
+ 
     // const {userEmail} = req.user
-
-    const user = await UserModel.findById(id)
-    if(!user)
-    {
-        return next(new ErrorHandler("No user Found",401))
-    }
-    const createEvent = await EventModel.create({title: title,start: start,end: end,user: user.id})
+    const createEvent = await EventModel.create(req.body)
 
     if(!createEvent)
     {
@@ -45,11 +40,8 @@ exports.getAllEvent = CatchAsyncError(async(req,res,next)=>{
 
     // const {id} = req.user
 
-    const {userEmail} = req.user
-    const user = await UserModel.findOne({userEmail: userEmail})
-    const events  = await EventModel.find({user: user.id })
+    const events  = await EventModel.find()
     
-
     
 
     if(!events)
@@ -86,7 +78,7 @@ exports.updateEvents = CatchAsyncError(async(req,res,next)=>{
 exports.deleteEvent = CatchAsyncError(async(req,res,next)=>{
 
     const {event_id} = req.params
-    console.log(req.params)
+ 
     const deleteEvent = await EventModel.findByIdAndDelete(event_id)
 
     if(!deleteEvent)
@@ -97,3 +89,74 @@ exports.deleteEvent = CatchAsyncError(async(req,res,next)=>{
     res.json(deleteEvent)
 })
 
+exports.filterCalender = CatchAsyncError(async(req,res)=>{
+
+    const option = false
+    const user =req.user
+    const today = new Date()
+    const date = new Date(Date.UTC(today.getFullYear(),today.getMonth(),1))
+    const enddate = new Date(Date.UTC(today.getFullYear(),today.getMonth()+1,0))
+  
+//    const filter = await EventModel.aggregate([
+  
+//     {
+//         $lookup:{
+//             from:"tasks",
+//             localField: "start",
+//             foreignField: "endDate",
+//             as:"details"
+//         }
+//     }
+//    ])
+
+const stringsd = "Hello"
+
+     const filter = await EventModel.aggregate([
+    
+        {
+            $unionWith: { coll: "tasks", pipeline: [ { $match: { endDate: {$gte: date,$lte: enddate} } } ] } , 
+        
+        }
+      
+     ])
+
+
+res.json({
+    success: true,
+    filter
+})
+})
+
+exports.filter = CatchAsyncError(async(req,res)=>{
+ 
+ const {event} = req.params
+
+    // const event = ['tasks','events']
+     const collections = ['tasks','events']
+
+
+
+     let events=''
+    
+    //  const ms = collections.filter((fil)=> fil!== event.at(0))
+   
+     const cols= collections.filter((col)=> event.includes(col)).map((col)=>({
+   
+        $unionWith:{coll: col}
+     }
+     ))
+     
+     if(cols.length > 0)
+     {
+         events = await EventModel.aggregate([cols])
+    //   events=   mongoose.connection.collection(`${event[0]}`).aggregate([cols])
+     }
+     if(!event.includes('event'))
+     {
+        events = events.filter((fil)=>{return fil.type!== 'event'})
+     }
+     res.json({
+        success: true,
+        events
+     })
+})

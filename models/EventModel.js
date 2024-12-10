@@ -1,23 +1,21 @@
 const mongoose = require("mongoose")
 
 const eventSchema = new mongoose.Schema({
-    title:{
+    subject:{
         type: String,
         required:[true,"Please Enter Event Name"]
     },
-    start:{
+    startDate:{
         type: Date,
         required:[true,"Please Enter Event Date"]
     },
-    end:{
+    endDate:{
         type: Date,
         required:[true,"Please Enter Event Date"]
     },
-    user:[
-        {
-            type: mongoose.Types.ObjectId
-        }
-    ]
+    type:{
+        type: String
+    }
     
 })
 

@@ -7,6 +7,7 @@ const ErrorMiddleWare = require("./middlewares/error")
 const {cronJob,cronJob2} = require("./utils/Cron")
 
 
+
 dotenv.config({path: path.join(__dirname,"./.env")})
 
 app.use(express.json())
@@ -17,6 +18,7 @@ app.use(cors())
 app.use(
     cors({
       origin:"*",
+      credentials: true
     })
   );
   app.use((_req, res, next) => {
@@ -34,6 +36,7 @@ const SpreadsheetRoute = require("./routes/SpreadsheetRoute")
 const AttendenceRoute = require("./routes/AttendenceRoute")
 const AdminRoute = require("./routes/AdminRoute")
 const AnnouncementRoute = require("./routes/AnnouncementRoute")
+const CustomerRoute = require("./routes/CustomerRoute")
 app.use("/api/v1",EventRoute)
 app.use("/api/v1",UserRoute)
 app.use("/api/v1",TaskRoute)
@@ -42,7 +45,10 @@ app.use("/api/v1",SpreadsheetRoute)
 app.use("/api/v1",AttendenceRoute)
 app.use("/api/v1",AdminRoute)
 app.use("/api/v1",AnnouncementRoute)
+app.use("/api/v1",CustomerRoute)
 app.use(ErrorMiddleWare)
 
-
+app.get("/",(req,res)=>{
+  res.send("Hello World")
+})
 module.exports = app

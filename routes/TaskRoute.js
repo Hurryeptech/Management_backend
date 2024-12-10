@@ -1,11 +1,13 @@
 const express = require("express")
-const { getAllTasks, updateTasks, memberTaskUpdate } = require("../controllers/TaskController")
+const {createTasks, getTasks, getSingleTasks, deleteTasks, tasksDashboard, getStaffs, updateTasks} = require("../controllers/TaskController")
 const {authenticate} = require("../middlewares/Authenticate")
 const router = express.Router()
 
-// router.route("/tasks/addTask/:id").post(addTask)
-router.route("/tasks/getAllTasks").get(getAllTasks)
-router.route("/tasks/updateTasks/:taskId").put(updateTasks)
-// router.route("/tasks/deleteTasks/:id").delete(deleteTask)
-router.route("/tasks/memberTaskUpdate/:id").put(authenticate,memberTaskUpdate)
+router.route("/task").post(authenticate,createTasks).get(authenticate,getTasks)
+router.route("/task/:id").get(authenticate,getSingleTasks).delete(authenticate,deleteTasks)
+router.route("/tasks/dashboard").get(authenticate,tasksDashboard)
+router.route("/tasks/getStaffs").get(getStaffs)
+router.route("/tasks/update/:id").put(updateTasks)
+
+
 module.exports = router

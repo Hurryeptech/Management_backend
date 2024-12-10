@@ -1,200 +1,137 @@
+const attendenceModel = require("../models/AttendenceModel")
 const CatchAsyncError = require("../middlewares/CatchAsyncError")
-const AttendenceModel = require("../models/AttendenceModel")
-const HolidayModel = require("../models/HolidayModel")
 const ErrorHandler = require("../utils/ErrorHandler")
 const moment = require("moment")
-
-// exports.login = CatchAsyncError(async(req,res,next)=>{
-
-//     const user = req.user
-//     const{date,time} = req.body
-
-//     const loginTime = await AttendenceModel.create({
-//         date: date,
-//         time: time,
-//         user: user
-//     })
-
-//     if(!loginTime)
-//     {
-//         return next(new ErrorHandler("Some error in adding login time",500))
-//     }
-
-//     res.status(201).json({
-//         success: true,
-//         message: "Login time added"
-//     })
-// })
-
-
-exports.logout = CatchAsyncError(async(req,res,next)=>{
-
-    const today= new Date()
-    const logoutTime = Date.now()
-    const dat = new Date(today.getFullYear(),today.getMonth(),today.getDate())
-    const  user = req.user
-    const logoutUser = await AttendenceModel.findOne({date: dat,user: user.id})
-
-    if(!logoutUser)
-        {
-            return next(new ErrorHandler("Log in First to logout",400))
-        }
-
-
-    if(logoutUser.logoutTime)
-    {
-        return next(new ErrorHandler("already Logged out",400))
-    }
+const { default: next } = require("next")
+exports.createCheckin = CatchAsyncError(async(req,res)=>{
    
-
-    logoutUser.logoutTime = logoutTime
-    const diff = (((logoutUser.logoutTime - logoutUser.loginTime) / 1000 /60 /60) %24)
-
-
-    if(diff <= 4)
-    {
-        if(user.paidLeave > 0)
-        {
-            user.paidLeave -= 1
-            logoutUser.status = "Paid Leave"
-        }
-        else if(user.sickLeave > 0)
-        {
-            user.sickLeave -= 1
-            logoutUser.status = "Sick Leave"
-        }
-        else
-        {
-            logoutUser.status = "Absent"
-        }
-        
-    }
-    else if(diff <= 7)
-    {
- 
-        logoutUser.status = "HalfDay"
-    }
-    else
-    {
-        
-        logoutUser.status = "Present"
-    }
-    await user.save()
-    await logoutUser.save()
-    res.status(201).json({
-        success: true,
-        message: "Logout time added",
-        logoutUser
-    })
-})
-
-exports.AttendenceAnalysis = CatchAsyncError(async(req,res,next)=>{
-
-    const {userEmail,_id} = req.user
     const user = req.user
     const today = new Date()
-    const firstdate = new Date(today.getFullYear(),today.getMonth(), 1, 0, 0, 0)
-    const lastDate = new Date(today.getFullYear(),today.getMonth()+1, 0, 23, 59, 59, 999)
-// const logs1 = await AttendenceModel.find({user: user.id,loginTime:{$gte: firstdate,$lte: lastDate}})
-
-   const logs = await AttendenceModel.aggregate([
-{
-    $match:{
-        user: user._id,
-        loginTime:{$gte : firstdate, $lte: lastDate}
-        
-    }
- }   ,
-    {
-        $facet:{
-            pres:[
-                {
-                 $match:{
-                    status: "Present"
-                 }
-                },
-                {
-                    $count: "count"
-                }
-            ],
-            abs:[
-                {
-                    $match:{
-                        status:"Absent"
-                    }
-                },
-                {
-                    $count:"count"
-                }
-            ]   ,
-            half:[
-                {
-                    $match:{
-                        status: "HalfDay"
-                    }
-                },
-                {
-                    $count: "count"
-                }
-            ],
-            paid:[
-                {
-                    $match:{
-                        status: "Paid Leave"
-                    }
-                },
-                {
-                    $count: "count"
-                }
-            ],
-            sick:[
-                {
-                    $match:{
-                        status: "Sick Leave"
-                    }
-                },
-                {
-                    $count: "count"
-                }
-            ]
-        }
-    }
-   ])
-
-   const present = logs[0]?.pres[0]?.count ?? 0
-   const absent = logs[0]?.abs[0]?.count ?? 0
-   const half = logs[0]?.half[0]?.count ?? 0
-   const paid = logs[0]?.paid[0]?.count ?? 0
-   const sick = logs[0]?.sick[0]?.count ?? 0
-   const paidRemaining = user.paidLeave
-   const sickRemaining = user.sickLeave
-    res.json({
-        present: present,
-        absent: absent,
-        half: half ,
-        paidTaken: paid,
-        sickTaken: sick,
-        paidRemaining,sickRemaining
-    })
+    const check = new Date(today.getFullYear(),today.getMonth(),today.getDate())
  
+    const checkin = await attendenceModel.create({date: check,checkin: today,user: user.id,status: 'active'})
+
+    res.status(201).json({
+        success: true,
+        checkin
+    })
+
 })
 
-exports.AttendenceDetails = CatchAsyncError(async(req,res,next)=>{
+exports.getCheckins = CatchAsyncError(async(req,res,next)=>{
 
-    const {id} = req.user
+    const user = req.user
+
     const today = new Date()
-    const firstdate = new Date(today.getFullYear(),today.getMonth(), 1, 0, 0, 0)
-    const lastDate = new Date(today.getFullYear(),today.getMonth()+1, 0, 23, 59, 59, 999)
- 
-    const details = await AttendenceModel.find({user: id,loginTime:{$gte: firstdate,$lte: lastDate}}).sort({_id: -1})
-
-    if(!details)
+    const check = new Date(today.getFullYear(),today.getMonth(),today.getDate())
+    let checkins = await attendenceModel.findOne({user: user.id,date: check,checkin:{$exists: true},checkout:{$exists:false}})
+  
+    if(!checkins)
     {
-        return next(new ErrorHandler("No Details Present in Database",404))
+        checkins = undefined
+    }
+  
+    res.status(200).json({
+        success: true,
+        checkins
+    })
+})
+
+exports.checkout = CatchAsyncError(async(req,res,next)=>{
+
+    const user = req.user
+
+    const today = new Date()
+    const check = new Date(today.getFullYear(),today.getMonth(),today.getDate())
+ 
+    const checkoutUpdate = await attendenceModel.findOne({date: check,user: user.id}).sort({_id: -1})
+    checkoutUpdate.checkout=new Date()
+    checkoutUpdate.status='check-out'
+   checkoutUpdate.status = 'checkout'
+   checkoutUpdate.save()
+    if(!checkoutUpdate)
+    {
+        return next(new ErrorHandler("not a valid log",400))
+    }
+    res.status(200).json({
+        success: true
+    })
+})
+
+exports.pauseTimer = CatchAsyncError(async(req,res)=>{
+
+ 
+    const user = req.user
+    const today = new Date()
+    const to = new Date(today.getFullYear(),today.getMonth(),today.getDate())
+    const time = await attendenceModel.findOne({date: to,user: user.id}).sort({_id:-1})
+time.pausedTimes.push(new Date())
+time.status = 'away'
+time.isPaused= true
+await time.save()
+    
+    
+    res.json({
+        success: true
+    })
+})
+
+exports.resumeTimer = CatchAsyncError(async(req,res)=>{
+
+    const today = new Date()
+    const user = req.user
+    const to = new Date(today.getFullYear(),today.getMonth(),today.getDate())
+    const time = await attendenceModel.findOne({date: to,user: user.id}).sort({_id:-1})
+
+    time.resumedTimes.push(new Date())
+time.status = 'active'
+time.isPaused= false
+  await time.save()
+
+    res.json({
+        success: true
+    })
+})
+
+exports.getAllUsersLogin = CatchAsyncError(async(req,res)=>{
+
+
+    const attendence = await attendenceModel.find().populate({path:'user',select:'firstName'})
+  
+    if(attendence.length < 0)
+    {
+        return next(new ErrorHandler("No Data Found",404))
     }
 
     res.status(200).json({
         success: true,
-        details
+        attendence
     })
+})
+
+exports.deleteCheckin = CatchAsyncError(async(req,res)=>{
+
+    const id=req.params
+
+    const dele= await attendenceModel.findByIdAndDelete(id)
+    res.json({
+        success: true
+    })
+})
+
+exports.getUserLogin = CatchAsyncError(async(req,res)=>{
+
+    const user = req.user
+    const attendence = await attendenceModel.find({user: user.id}).populate({path:'user',select:'firstName'})
+
+    if(attendence.length < 0)
+        {
+            return next(new ErrorHandler("No Data Found",404))
+        }
+    
+        res.status(200).json({
+            success: true,
+            attendence
+        })
+
 })

@@ -1,28 +1,38 @@
 const mongoose = require("mongoose")
+const moment = require("moment")
 
 const attendenceSchema = new mongoose.Schema({
-
     date:{
-        type: Date,
-    },
-    loginTime:{
         type: Date
     },
-    logoutTime:{
+    checkin:{
         type: Date
     },
-    halfDay:{
-        type: Number
+    checkout:{
+        type: Date
     },
-    late:{
-        type: Number
+    loggedHours:{
+        type: Number,
     },
+    pausedTimes:[
+       {
+        type: Date
+       }
+    ],
+    resumedTimes:[
+       {
+        type: Date
+       }
+    ],
     status:{
         type: String
     },
+    isPaused:{
+        type: Boolean
+    },
     user:{
         type: mongoose.Types.ObjectId,
-        ref:"users"
+        ref:"User"
     }
 })
 

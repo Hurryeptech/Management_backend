@@ -1,5 +1,5 @@
 const express = require("express")
-const { signup, signin, verifyOtp, viewProfile, sendMailNew, requestLeave, getUserLeaveHistory, dashboard, updateProfile, viewScoialProfile } = require("../controllers/UserController")
+const { signup, signin, verifyOtp, viewProfile, sendMailNew, requestLeave, getUserLeaveHistory, dashboard, updateProfile, viewScoialProfile, updatePermissions, getPermissions, gSignin } = require("../controllers/UserController")
 const {getAnnouncements} = require("../controllers/AnnouncementController")
 const {authenticate} = require("../middlewares/Authenticate")
 const router = express.Router()
@@ -30,15 +30,12 @@ const storage = multer.diskStorage({
 const upload = multer({ storage });
 
 
-router.route("/user/sendMailNew").post(sendMailNew)
-router.route("/user/signup").post(signup)
+
+router.route("/user/gSignin").post(gSignin)
 router.route("/user/signin").post(signin)
 router.route("/user/verifyOtp").post(verifyOtp)
 router.route("/user/viewProfile").get(authenticate,viewProfile)
-router.route("/user/viewSocilaProfile/:email").get(viewScoialProfile)
 router.route("/user/requestLeave").post(authenticate,requestLeave)
-router.route("/user/getAnnouncements").put(authenticate,getAnnouncements)
-router.route("/user/leaveHistory").get(authenticate,getUserLeaveHistory)
-router.route("/user/dashboard").get(authenticate,dashboard)
-router.route("/user/updateProfile").put(authenticate,upload.single('image'),updateProfile)
+router.route("/user/permissions/:id").put(authenticate,updatePermissions)
+router.route("/user/getPermissions/:id").get(authenticate,getPermissions)
 module.exports = router

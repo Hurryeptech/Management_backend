@@ -32,7 +32,7 @@ exports.authenticate = async (req, res, next) => {
     if (!user) {
         return next(new ErrorHandler("Not a User", 401))
     }
-
+  
     req.user = user
     next()
 }
@@ -52,20 +52,23 @@ exports.authenticateAdmin = async (req, res, next) => {
         return next(new ErrorHandler("Your session is expired", 401))
     }
 
-    const admin = await AdminModel.findById(verified.id)
-    if (!admin) {
-        return next(new ErrorHandler("Not an Valid admin user", 401))
+    const admin = await userModel.findById(verified.id)
+    if (admin.administrator) {
+        req.admin = admin
+    }
+    else
+    {
+        return next(new ErrorHandler("Not an Admin",401))
     }
 
-    req.admin = admin
+   
     next()
 }
-exports.authenticateRole = function (...roles) {
-
-    return async (req, res, next) => {
-        if (!(roles.includes(req.admin.role))) {
+exports.authenticateRole =  async (req, res, next) => {
+    
+    if (!req.user.administrator) {
             return next(new ErrorHandler("Admins can only login", 401))
         }
         next()
-    }
+    
 }

@@ -2,6 +2,7 @@ const CatchAsyncError = require("../middlewares/CatchAsyncError")
 const AnnouncementModel = require("../models/AnnouncementModel")
 const ErrorHandler = require("../utils/ErrorHandler")
 
+
 exports.createAnnouncement = CatchAsyncError(async(req,res,next)=>{
 
     const {date,title,description} = req.body
@@ -36,12 +37,14 @@ exports.updateAnnouncement = CatchAsyncError(async(req,res,next)=>{
 
 
 exports.getAnnouncements = CatchAsyncError(async(req,res)=>{
-
-    const announcement = await AnnouncementModel.find()
+   
+    const user= req.user
+    const userId = user.id
+    const announcement = await AnnouncementModel.find().sort({_id: -1})
     const update = await AnnouncementModel.updateMany({userId:{$nin:[req.user.id]}},{$addToSet:{userId:req.user.id}})
     const unread = update.matchedCount
 
-    console.log(update)
+    
     res.json({
         success: true,
         announcement,
