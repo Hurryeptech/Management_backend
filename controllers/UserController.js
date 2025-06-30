@@ -24,7 +24,7 @@ exports.gSignin = CatchAsyncError(async(req,res,next)=>{
  
    if(!user)
    {
-    return next(new ErrorHandler("Not a valid User",401))
+    return next(new ErrorHandler("Not a Knowned User",401))
    }
 
    let details;
