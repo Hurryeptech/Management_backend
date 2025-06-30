@@ -1,35 +1,71 @@
 const mongoose = require("mongoose")
 const LeaveSchema = new mongoose.Schema({
-
-    user:{
-        type: mongoose.Types.ObjectId,
-        ref:"users"
+    userId: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "User",
+      required: true,
     },
-    userName:{
-        type: String
+    username: {
+      type: String,
+      required: true,
     },
-    type:{
-        type: String
+    leaveBalances: {
+      type: Object
     },
-    startDate:{
-        type: Date,
-        required:[true,"Please Enter Start Date"]
+    lastResetDate: {
+      type: Map,
+      of: Date,
+      default: {},
     },
-    endDate:{
-        type: Date,
-        required:[true,"Please Enter End Date"]
-    },
-    reason:{
-        type: String
-    },
-    status:{
-        type: String,
-        default: 'progress'
-    },
-    rejectReason:{
-        type: String
-    }
-
-})
-
+    leaveRequests: [
+      {
+        file:{
+          type: String, 
+        },
+        resultby: {
+          type: String,
+        },
+        leavetype: {
+          type: String,
+          required: true,
+        },
+        fromDate: {
+          type: String,
+          required: true,
+        },
+        toDate: {
+          type: String,
+          required: true,
+        },
+        subject: {
+          type: String,
+          required: true,
+        },
+        remarks: {
+          type: String,
+          required: false,
+        },
+        status: {
+          type: String,
+          required: true,
+          default: "Pending",
+        },
+        fs: {
+          type: String,
+          required: true,
+          enum: ["FN", "AN"],
+        },
+        ts: {
+          type: String,
+          required: true,
+          enum: ["FN", "AN"],
+        },
+        numofdays: {
+          type: Number,
+          required: true,
+        },
+      },
+    ],
+  });
+LeaveSchema.plugin
 module.exports = mongoose.model("Leave",LeaveSchema)

@@ -6,7 +6,7 @@ const {body,validationResult}= require("express-validator")
 const { RegisterAdmin, LoginAdmin, VerifyOtp, GetUsersEmail, addUser, deleteUser, getUserDetails, getAllUsers, getLeaveNewRequests, giveLeaveStatus, getLeaveHistory, userProfile, adminDashboard, createCustomer} = require("../controllers/AdminController")
 const { addHolidays, getHolidays, updateHoliday, deleteHoliday } = require("../controllers/HolidayController")
 const {authenticate,authenticateRole} = require("../middlewares/Authenticate")
-const { updateSetup, addSetup, deleteSetup, getSetups } = require("../controllers/SetupController")
+const { updateSetup, addSetup, deleteSetup, getSetups, getAllSetups, getAllTax } = require("../controllers/SetupController")
 const { getAllUsersLogin } = require("../controllers/AttendenceController")
 const router = express.Router()
 
@@ -57,10 +57,12 @@ router.get("/admin/getLogin",getAllUsersLogin)
 
 
 
-router.route("/admin/addCustomer").post(createCustomer)
+// router.route("/admin/addCustomer").post(createCustomer)
 router.route("/admin/setup").put(addSetup)
 router.route("/admin/updateSetup").put(updateSetup)
 router.route("/admin/deleteSetup").delete(deleteSetup)
+router.route("/admin/getalltax").get(getAllTax)
 router.route("/admin/getSetups/:category/:subCategory").get(getSetups)
+router.route("/admin/getAllSetups").get(getAllSetups)
 
 module.exports = router

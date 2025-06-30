@@ -9,12 +9,7 @@ const setupSchema = new mongoose.Schema({
         ],
         status: [
            {
-            statusName:{
-                type: String
-            },
-            orderNo:{
-                type: Number
-            }
+            type: String
            }
         ],
         heatnessLevel: 
@@ -24,14 +19,21 @@ const setupSchema = new mongoose.Schema({
                 }
             ]
 
-        
+        ,
+        categories:[
+            {
+                type: String
+            }
+        ]
             
         
     },
     customers:{
         groups: [
             {
-                type: Object
+                group:{
+                    type: String
+                }
             }
         ]
     },
@@ -60,32 +62,35 @@ const setupSchema = new mongoose.Schema({
         ],
         leaveTypes: [
             {
-                name:{
-                    type: String
-                },
-                type:{
-                    type: String
-                },
-                remarks:{
-                    type: String
-                },
-                leavePerYear:{
-                    type: Number
-                },
-                createdBy:{
-                    type: String
-                },
-                createdAt:{
-                    type: Date
-                },
-                updatedBy:{
-                    type: String
-                },
-                updatedAt:{
-                    type: Date
-                }
-            }
-        ],
+              leaveAccrualType: {
+                type: String,
+              },
+              carryForward: {
+                type: String,
+              },
+              carryForwardType: {
+                type: String,
+              },
+              numberOfDays:{
+                type: Number
+              },
+              leaveType:{
+                type:String
+              },
+              createdBy: {
+                type: String,
+              },
+              dateCreated: {
+                type: Date,
+              },
+              updatedBy: {
+                type: String,
+              },
+              updatedAt: {
+                type: Date,
+              },
+            },
+          ],
         checklists:[
            {
             name:{
@@ -129,12 +134,14 @@ const setupSchema = new mongoose.Schema({
                 symbol:{
                     type: String
                 },
-                decimalSeperator:{
+                decimalSeparator:{
                     type: String
                 },
-                thousandSeperator:{
+         
+                thousandSeparator:{
                     type: String
                 },
+               
                 currencyPlacement:{
                     type: String
                 }
@@ -180,7 +187,25 @@ const setupSchema = new mongoose.Schema({
         {
             type: String
         }
+    ],
+    assets: {
+        asset:[
+        {
+          item: { type: String, required: true },
+          quantity: { type: Number, required: true },
+          notes: { type: String, required: false },
+        },
     ]
+},
+  tags:{
+    tag:[
+        {tagName:{
+        type: String
+    }
+  }]
+  }
+
+   
 })
 
 

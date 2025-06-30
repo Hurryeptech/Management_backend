@@ -21,10 +21,10 @@ app.post('/api/v1/admin/createAnnouncement',async (req,res)=>{
     const {date,title,description} = req.body
     const announcement = await AnnouncementModel.create({date,title,description})
 
-    // if(!announcement)
-    // {
-    //     return next(new ErrorHandler("Error in creating records",400))
-    // }
+    if(!announcement)
+    {
+        return next(new ErrorHandler("Error in creating records",400))
+    }
       
         io.emit('Receive',"Event added successfully")
     

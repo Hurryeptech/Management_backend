@@ -1,108 +1,84 @@
-const mongoose = require("mongoose")
-const jwt = require("jsonwebtoken")
+const mongoose = require("mongoose");
+const jwt = require("jsonwebtoken");
 const customerSchema = new mongoose.Schema({
+  companyName: {
+    type: String,
+    required: [true, "Please Enter Company Name"],
+  },
+  contact: {
+    type: String,
+    required: [true, "Please Enter Contact Person"],
+  },
+  gstNo: {
+    type: String,
+  },
+  assigned: {
+    type: String,
+    required: true,
+  },
+  mobile: {
+    type: String,
+    required: [true, "Please Enter Mobile Number"],
+    unique: true,
+  },
+  email: {
+    type: String,
+    required: [true, "Please Enter Email"],
+    unique: true,
+  },
+  active: {
+    type: Boolean,
+    default: true,
+    required: true,
+  },
+  billing: {
+    street: {
+      type: String,
+      required: [true, "Please Enter Street"],
+    },
+    city: {
+      type: String,
+      required: [true, "Please Enter City"],
+    },
+    state: {
+      type: String,
+      required: [true, "Please Enter State"],
+    },
+    country: {
+      type: String,
+      required: [true, "Please Enter Country"],
+    },
+    pincode: {
+      type: String,
+      required: [true, "Please Enter Pincode"],
+    },
+  },
+  shipping: {
+    street: {
+      type: String,
+      required: false,
+    },
+    city: {
+      type: String,
+      required: false,
+    },
+    state: {
+      type: String,
+      required: false,
+    },
+    country: {
+      type: String,
+      required: false,
+    },
+    pincode: {
+      type: String,
+      required: false,
+    },
+  },
+});
 
-    companyName:{
-        type: String,
-        required:[true,"Please Enter Company Name"]
-    },
-    address:{
-        street:{
-            type: String
-        },
-        state:{
-            type: String
-        },
-        city:{
-            type: String
-        },
-        street:{
-            type: String
-        },
-        zipcode:{
-            type: Number
-        }
-    },
-    gstNumber:{
-        type: String
-    },
-    phone:{
-        type: Number
-    },
-    website:{
-        type: String
-    },
-    group:{
-        type: String
-    },
-    currency:{
-        type: String
-    },
-    billingAddress:{
-        state:{
-            type: String
-        },
-        city:{
-            type: String
-        },
-        street:{
-            type: String
-        },
-        pincode:{
-            type: Number
-        },
-        country:{
-            type: String
-        }
-    },
-    shippingAddress:{
-        state:{
-            type: String
-        },
-        city:{
-            type: String
-        },
-        street:{
-            type: String
-        },
-        zipcode:{
-            type: Number
-        },
-        country:{
-            type: String
-        }
-    },
-    otp:{
-        type: String
-    },
-    otpExpire:{
-        type: Date
-    },
-    contactPerson:{
-        name:{
-            type: String
-        },
-        email:{
-            type: String
-        },
-        position:{
-            type: String
-        },
-        phone:{
-            type: Number
-        },
-        active:{
-            type: Boolean
-        }
-    }
-})
+// customerSchema.methods.getJwtToken = function () {
+//   return jwt.sign({ id: this.id }, process.env.JWT_SECRET, { expiresIn: "7d" });
+// };
 
-
-customerSchema.methods.getJwtToken = function(){
-
-    return jwt.sign({id: this.id},process.env.JWT_SECRET,{expiresIn: '7d'})
-    
-}
-
-
-module.exports = mongoose.model("Customer",customerSchema)
+module.exports = mongoose.model("Customer", customerSchema)

@@ -281,17 +281,17 @@ exports.userProfile = CatchAsyncError(async(req,res,next)=>{
     })
 })
 
-exports.createCustomer = CatchAsyncError(async(req,res,next)=>{
+// exports.createCustomer = CatchAsyncError(async(req,res,next)=>{
 
-    if(!req.body)
-    {
-        return next(new ErrorHandler("request is empty",400))
-    }
+//     if(!req.body)
+//     {
+//         return next(new ErrorHandler("request is empty",400))
+//     }
 
-    const customer = await customerModel.create(req.body)
+//     const customer = await customerModel.create(req.body)
 
-    res.status(201).json({
-        success: true,
-        customer
-    })
-})
+//     res.status(201).json({
+//         success: true,
+//         customer
+//     })
+// })

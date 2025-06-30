@@ -6,22 +6,29 @@ const AdminModel = require("../models/AdminModel")
 const SendToken = require("../utils/SendToken")
 
 exports.authenticate = async (req, res, next) => {
-
-
+    // let cookies =req.cookies.token ;
+   
+    let bearer;
+   
     const token = req.headers['authorization']
+    
     if (!token) {
+        
         return next(new ErrorHandler("Login first to continue", 401))
-    }
-
-    const bearer = token && token.split(' ')[1]
-
-    const accessToken = bearer
+        
+    }    
+else
+{
+  bearer = token && token.split(' ')[1]
+}
+    // const accessToken = bearer
 
     let decoded={}
-    
-    
+   
+ 
       try {
-     decoded = jwt.verify(accessToken, process.env.JWT_SECRET)
+     decoded = jwt.verify(bearer, process.env.JWT_SECRET)
+    
       } catch (error) {
         return next(new ErrorHandler("Token Expired",400))
       }

@@ -7,6 +7,8 @@ const SendToken = require("../utils/SendToken")
 const AttendenceModel = require("../models/AttendenceModel")
 const moment = require("moment")
 const HolidayModel = require("../models/HolidayModel")
+const AllowanceModel = require("../models/AllowanceModel");
+const PayrollModel = require("../models/SalaryModel");
 const cloudinary = require("../utils/Cloudinary")
 const fs = require("fs-extra")
 const LeaveModel = require("../models/LeaveModel")
@@ -195,7 +197,134 @@ exports.getPermissions = CatchAsyncError(async(req,res)=>{
 })
 
 
+exports.getUserDetails = CatchAsyncError(async(req,res)=>{
+
+    const {id} = req.params
+    const user = await userModel.findById(id)
+
+    res.status(200).json({
+        success: true,
+        user
+    })
+})
 
 
 
+exports.addAllowance = CatchAsyncError(async (req, res, next) => {
 
+  const { allowanceName, componentType, percentage, amount } = req.body;
+
+  const addallowance = await AllowanceModel.create({
+    allowanceName,
+    componentType,
+    percentage,
+    amount
+  });
+
+  if (!addallowance) {
+    return next(new ErrorHandler("Error in adding Allowance", 400));
+  }
+
+  res.status(201).json({
+    success: true,
+    message: 'Allowance Added Successfully'
+  });
+});
+exports.editAllowance = CatchAsyncError(async (req, res, next) => {
+
+  const { _id, allowanceName, componentType, percentage, amount } = req.body;
+
+  const addallowance = await AllowanceModel.findByIdAndUpdate({ _id }, {
+    allowanceName,
+    componentType,
+    percentage,
+    amount
+  }, { new: true, upsert: true });
+
+  if (!addallowance) {
+    return next(new ErrorHandler("Error in updating Allowance", 400));
+  }
+
+  res.status(201).json({
+    success: true,
+    message: 'Allowance Updated Successfully'
+  });
+});
+exports.deleteAllowance = CatchAsyncError(async (req, res, next) => {
+
+  const { id } = req.query;
+  const deleteallowance = await AllowanceModel.findByIdAndDelete({ _id: id });
+
+  if (!deleteallowance) {
+    return next(new ErrorHandler("Error in deleting Allowance", 400));
+  }
+
+  res.status(201).json({
+    success: true,
+    message: 'Allowance Deleted Successfully'
+  });
+});
+exports.getAllAllowance = CatchAsyncError(async (req, res, next) => {
+
+  const allowances = await AllowanceModel.find();
+
+  res.status(201).json({
+    success: true,
+    allowances: allowances || []
+  });
+});
+exports.addPayroll = CatchAsyncError(async (req, res, next) => {
+
+  const data = req.body;
+
+  const addsalary = await PayrollModel.create(data);
+
+  if (!addsalary) {
+    return next(new ErrorHandler("Error in adding Allowance", 400));
+  }
+
+  res.status(201).json({
+    success: true,
+    message: 'Payroll Added Successfully'
+  });
+});
+exports.editPayroll = CatchAsyncError(async (req, res, next) => {
+
+  const { _id, ...rest } = req.body;
+
+  const addallowance = await PayrollModel.findByIdAndUpdate({ _id }, {
+    ...rest,
+  }, { new: true, upsert: true });
+
+  if (!addallowance) {
+    return next(new ErrorHandler("Error in updating Allowance", 400));
+  }
+
+  res.status(201).json({
+    success: true,
+    message: 'Payroll Updated Successfully'
+  });
+});
+exports.deletePayroll = CatchAsyncError(async (req, res, next) => {
+
+  const { id } = req.query;
+  const deletesalary = await PayrollModel.findByIdAndDelete({ _id: id });
+
+  if (!deletesalary) {
+    return next(new ErrorHandler("Error in deleting Allowance", 400));
+  }
+
+  res.status(201).json({
+    success: true,
+    message: 'Payroll Deleted Successfully'
+  });
+});
+exports.getAllPayroll = CatchAsyncError(async (req, res, next) => {
+
+  const payrolls = await PayrollModel.find();
+
+  res.status(201).json({
+    success: true,
+    payrolls: payrolls || []
+  });
+});

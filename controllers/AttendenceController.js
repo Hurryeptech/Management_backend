@@ -2,7 +2,7 @@ const attendenceModel = require("../models/AttendenceModel")
 const CatchAsyncError = require("../middlewares/CatchAsyncError")
 const ErrorHandler = require("../utils/ErrorHandler")
 const moment = require("moment")
-const { default: next } = require("next")
+
 exports.createCheckin = CatchAsyncError(async(req,res)=>{
    
     const user = req.user
@@ -22,9 +22,9 @@ exports.getCheckins = CatchAsyncError(async(req,res,next)=>{
 
     const user = req.user
 
-    const today = new Date()
+    const today = new Date('2025-03-28')
     const check = new Date(today.getFullYear(),today.getMonth(),today.getDate())
-    let checkins = await attendenceModel.findOne({user: user.id,date: check,checkin:{$exists: true},checkout:{$exists:false}})
+    let checkins = await attendenceModel.findOne({user: user.id,checkin:{$exists: true},checkout:{$exists:false}})
   
     if(!checkins)
     {
